@@ -1,0 +1,79 @@
+﻿<head>
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+   @* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">*@
+    @*<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>*@
+    <script src="~/Scripts/a076d05399.js"></script>
+</head>
+<body>
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button"id="btnemployee" class="btn btn-secondary" style="width:300px;"><i class="fa fa-users" style="font-size:25px"></i>Employee</button>
+        <button type="button" id="btndepartment" class="btn btn-secondary" style="width:300px;"><i class='far fa-building' style='font-size:25px'></i>Department</button>
+        <button type="button" id="btnsalary" class="btn btn-secondary" style="width:300px;"><i class='fas fa-dollar-sign' style='font-size:25px'></i>Salary</button>
+        <button type="button" id="btnlogout" class="btn btn-secondary" style="width:240px;"><i class='fas fa-sign-out-alt' style='font-size:25px'></i>LogOut
+             </button>
+    </div>
+</body>
+<script>
+    $(document).ready(function () {
+        $("#btnlogout").click(function () {
+            debugger;
+            $.ajax({
+                type: 'Get',
+                url: "/Home/Index",
+                contentType: "application/json; charset=utf-8",
+                success: function () {
+                    alert("Logged Out success")
+                    window.location = "/Home/Index";
+                    //window.location.reload;
+                },
+                error: function () {
+                    alert("Not Logged Out");
+                }
+            })
+        })
+
+        $("#btndepartment").click(function () {
+            debugger;
+
+          
+          
+            window.location = "/EMS/Department";
+
+
+        })
+
+        $("#btnemployee").click(function () {
+            window.location = "/EMS/Index";
+        })
+
+        $("#btnsalary").click(function () {
+            window.location = "/EMS/Salary";
+        })
+
+        //function LoadData() {
+        //    debugger
+        //    $.ajax({
+        //        type: 'GET',
+        //        url: '/EMS/Department',
+        //        contentType: 'application/json; charset=utf-8',
+
+        //        success: function (data) {
+        //            var items = '';
+        //            $.each(data, function (i, item) {
+        //                var rows = "<tr>"
+        //                    + "<td class='prtoducttd'>" + item.Id + "</td>"
+        //                    + "<td class='prtoducttd'>" + item.Department_Name + "</td>"
+        //                    + "</tr>";
+        //                $('#tbldep tbody').append(rows);
+        //            });
+        //        },
+        //        error: function (ex) {
+        //            alert("not show")
+        //        }
+        //    });
+        //}
+
+    });
+</script>

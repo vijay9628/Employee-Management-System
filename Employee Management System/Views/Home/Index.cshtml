@@ -1,0 +1,159 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<head>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+</head>
+<body>
+
+    <div class="split left col-lg-6" style="background-color:red; height:400px;" >
+        <h5 style="margin-bottom:200px;">
+            Employee MS<br />
+            C# .Net<br />
+            Sql Server<br />
+        </h5>
+    </div>
+    <div class="split right" style="background-color:aquamarine; height:400px;">
+        <label>
+            User Name
+        </label><br />
+        <input type="text" id="txtname"/><br />
+        <label>Password</label><br />
+        <input type="text" id="txtpassword"/><br />
+        <br />
+        <button type="button" style="margin-left:60px;" id="btnlogin">Login</button> &nbsp;&nbsp;
+        <button type="button" data-target="#registerModal" data-toggle="modal"> Register</button>
+        <div>
+            <button type="button" id="btnreset" data-target="#exampleModal" data-toggle="modal"> Reset</button>
+        </div>
+
+    </div>
+</body>
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div><label>Email Id</label></div>
+                <div><input type="text" id="txtemail" /></div>
+                <div><label>Enter New Password</label></div>
+                <div><input type="text" id="txtpasswordn" /></div>
+                <div><label>ReEnter Password</label></div>
+                <div><input type="text" id="txtrepassword" /></div>
+              
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnsavechanges">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+  @*register modal*@
+
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div><label>Name</label></div>
+                <div><input type="text" id="txtnamer" /></div>
+                <div><label>Email Id</label></div>
+                <div><input type="text" id="txtemailr" /></div>
+                <div><label>Gender</label></div>
+                <div><input type="text" id="txtgender" /></div>
+                <div><label>Age</label></div>
+                <div><input type="text" id="txtage" /></div>
+                <div><label>Password</label></div>
+                <div><input type="text" id="txtpasswordr" /></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnsave">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $("#btnsave").click(function () {
+            var register = {
+                Name: $("#txtnamer").val(),
+                Email: $("#txtemailr").val(),
+                Gender: $("#txtgender").val(),
+                Age: $("#txtage").val(),
+                Password: $("#txtpasswordr").val()
+            }
+
+            $.ajax({
+                type:"POST",
+                url:"/Home/Register",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(register),
+                success: function (data) {
+                    $("#registerModal").modal("hide");
+                    alert("Registerd Successfully");
+                },
+                error: function () {
+                    alert("Not Registerd")
+                }
+                
+            })
+        })
+
+        $("#btnlogin").click(function () {
+            var login = {
+                Name: $("#txtname").val(),
+                Password: $("#txtpassword").val()
+            }
+            $.ajax({
+                type: "POST",
+                url: "/Home/Loginpage",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(login),
+                success: function (data) {
+                    alert("Login Successfully");
+                    window.location = "/EMS/Index";
+                },
+                error: function () {
+                    alert("Login Faild");
+                }
+            })
+        })
+
+        $("#btnsavechanges").click(function () {
+            var newp = {
+                Email: $("#txtemail").val(),
+                Password: $("#txtpasswordn").val()
+            }
+            $.ajax({
+                type: "POST",
+                url: "/Home/Reset",
+                contentType:"application/json; charset=utf-8",
+                data: JSON.stringify(newp),
+                success: function (data) {
+                    $("#exampleModal").modal("hide");
+                    alert("Password Update Successfully")
+                    location.reload();
+                }
+            })
+        })
+    });
+</script>

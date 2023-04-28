@@ -1,0 +1,171 @@
+﻿@{
+    ViewBag.Title = "Department";
+}
+@Html.Partial("subviewpartial")
+@*<head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+    </head>
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-secondary" style="width:300px;"><i class="fa fa-users" style="font-size:25px"></i>Employee</button>
+        <button type="button" class="btn btn-secondary" style="width:300px;"><i class='far fa-building' style='font-size:25px'></i>Department</button>
+        <button type="button" class="btn btn-secondary" style="width:300px;"><i class='fas fa-dollar-sign' style='font-size:25px'></i>Salary</button>
+        <button type="button" class="btn btn-secondary" style="width:240px;"><i class='fas fa-sign-out-alt' style='font-size:25px'></i>LogOut</button>
+    </div>*@
+<h2 style="text-align:center;">Manage Department</h2>
+
+<body style="height:auto">
+
+    <div class="split col-lg-5"  style="color: burlywood;">
+        <div><i class='far fa-building' style='font-size:25px'></i></div>
+        <div><input type="hidden" id="txtId"/></div>
+        <div><label>Department Name</label></div>
+        <div><input type="text" class="form-control"  id="txtdep"/></div>
+        <div>
+            <button type="button" id="btnadd">Add</button>
+            <button type="button" id="btnupdate">Update</button>
+            <button type="button" id="btndelete">Delete</button>
+            <button type="button" id="btnclear">Clear</button>
+
+        </div>
+    </div>
+    <div class="split col-lg-7" >
+
+            <table style="background-color:burlywood" id="tbldep" class="table table-bordered table-responsive table-striped">
+                <thead>
+                    <tr>
+                        <th>Dep Id</th>
+                        <th>Dep Name</th>
+                    </tr>
+                </thead>
+                <tbody id="target">
+                   
+                </tbody>
+            </table>
+
+    </div>
+
+</body>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            type: "Get",
+            url: "/EMS/depData",
+            contentType: "application/json; charset=utf-8",
+            //data: JSON.stringify(dep),
+            success: function (resp) {
+                var items = '';
+                $.each(resp, function (i, item) {
+                    var rows = "<tr>"
+                        + "<td class='prtoducttd'>" + item.Id + "</td>"
+                        + "<td class='pname'>" + item.Department_Name + "</td>"
+                        + "</tr>";
+                    $('#tbldep tbody').append(rows);
+                });
+                //$("#tbldep tbody").append(data);
+
+                //$("#tbldep tbody").append("<tr><td>" + resp.Id + "</td><td>" + resp.Department_Name + "</td></tr>");
+                // alert("Add Successfully");
+            }
+        })
+
+
+
+
+
+
+
+        $("#btnadd").click(function () {
+            var dep = {
+                Department_Name: $("#txtdep").val()
+            }
+
+            $.ajax({
+                type: "post",
+                url: "/EMS/Department",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(dep),
+                success: function (resp) {
+                    var items = '';
+                    $.each(resp, function (i, item) {
+                        var rows = "<tr>"
+                            + "<td class='prtoducttd'>" + item.Id + "</td>"
+                            + "<td class='pname'>" + item.Department_Name + "</td>"
+                            + "</tr>";
+                        $('#tbldep tbody').append(rows);
+                    });
+                    //$("#tbldep tbody").append(data);
+
+                    //$("#tbldep tbody").append("<tr><td>" + resp.Id + "</td><td>" + resp.Department_Name + "</td></tr>");
+                    alert("Add Successfully");
+                }
+            })
+
+        })
+
+
+        //$("tbody").on('click' ,function(){
+
+        //    debugger;
+        //    this.id;
+        //    $("target").click(function () {
+        //       var data= this.id;
+        //    })
+        //    this.Department_Name;
+        //})
+
+        $("#btndepartment").click(function () {
+        })
+
+        $('#tbldep tbody').on('click', 'tr', function () {
+            $("#txtId").val(this.cells[0].innerHTML);
+            $("#txtdep").val(this.cells[1].innerHTML);
+
+            console.log(data.innerHTML);
+            var carId = data['id'];
+            console.log(carId);
+        })
+
+        $("#btnupdate").click(function () {
+            var dep = {
+                Id: $("#txtId").val(),
+                Department_Name: $("#txtdep").val()
+            }
+            $.ajax({
+                type: "POST",
+                url: "/EMS/UpdateDep",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(dep),
+                success: function (data) {
+                    console.log(data);
+                    $("#txtdep").val('');
+                    location.reload();
+                }
+            })
+        })
+
+
+        $("#btndelete").click(function () {
+            var dep = {
+                Id: $("#txtId").val(),
+                Department_Name:$("#txtdep").val()
+            }
+            $.ajax({
+                type: "POST",
+                url: "/EMS/DeleteDep" ,
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(dep),
+                success: function (resp) {
+                    location.reload();
+                }
+                
+            })
+        })
+
+        $("#btnclear").click(function () {
+            $("#txtdep").val('');
+          
+        })
+
+    });
+</script>

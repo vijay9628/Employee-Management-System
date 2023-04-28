@@ -1,0 +1,232 @@
+﻿
+@{
+    ViewBag.Title = "Salary";
+}
+
+@Html.Partial("subviewpartial")
+@*<head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+    </head>
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-secondary" style="width:300px;"><i class="fa fa-users" style="font-size:25px"></i>Employee</button>
+        <button type="button" class="btn btn-secondary" style="width:300px;"><i class='far fa-building' style='font-size:25px'></i>Department</button>
+        <button type="button" class="btn btn-secondary" style="width:300px;"><i class='fas fa-dollar-sign' style='font-size:25px'></i>Salary</button>
+        <button type="button" class="btn btn-secondary" style="width:240px;"><i class='fas fa-sign-out-alt' style='font-size:25px'></i>LogOut</button>
+    </div>*@
+<div>
+    <h2 style="text-align:center">Manage Salary</h2>
+</div>
+<body>
+    <div id="" class="split col-lg-4" style="color: yellowgreen; height: 300px; ">
+
+        <div><label>Employee</label></div>
+        <div><input type="hidden" class="form-control" id="txtSCode" /></div>
+        <div>
+            @*<input type="text" class="form-control"  id="txtemp"/>*@
+            @Html.DropDownList("-Select", new SelectList(ViewBag.salary, "Id", "EmpName"), "Select Employee", new { Id = "txtDep", @class = "form-control" })
+
+        </div>
+        <div><label>Day's Attends</label></div>
+        <div><input type="text" class="form-control" id="txtday" /></div>
+        <div><label>Period</label></div>
+        <div><input type="date" class="form-control" id="txtperiod" /></div>
+        @*<div><label>Salary Amount</label></div>*@
+        <div>
+        </div>
+        <div><label>Rs : </label></div>
+        <div><input type="text" disabled="disabled" id="txttotal" class="form-control" value="@ViewData["eds"]" /></div>
+        <div>
+        </div>
+        <div>
+            <button type="button" id="btnadd">Add</button>
+            <button type="button" id="btnupdate">Update</button>
+            <button type="button" id="btnclear" >Clear</button>
+        </div>
+    </div>
+    <div class=" split col-lg-8" style="height:300px;">
+        <table id="tblsal" class="table table-bordered table-responsive table-striped" style="background-color:yellowgreen">
+            <thead>
+                <tr>
+                    <td>SCode</td>
+                    <td>Emp No</td>
+                    <td>Attendence</td>
+                    <td>Period</td>
+                    <td>Amount</td>
+                    <td>PayDate</td>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</body>
+
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+<script type="text/javascript">
+
+
+
+
+    $(document).ready(function () {
+        $.ajax({
+            type: "Post",
+            url: "/EMS/salary",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                var item = '';
+                $.each(result, function (i, item) {
+                    var data = item.Period.split('/Date(',);
+                    var dat = data[1].split(')/',);
+                    var nd = dat[0] * 1;
+                    var date = new Date(nd).toString().split('00', '55');
+                    //var ndate = date.split('1', '15');
+                    var payday = 07 
+                    var row = "<tr>"
+                        + "<td class='scode'>" + item.SCode + "</td>"
+                        + "<td class='empno'>" + item.EmpNo + "</td>"
+                        + "<td class='attemdence'>" + item.DayAttend + "</td>"
+                        + "<td class='period'>" + date[0] + "</td>"
+                        + "<td class='amount'>" + item.SalaryAmount + "</td>"
+                        + "<td class='paydate'>" + payday + "</td>"
+
+                    "</tr>"
+                    $('#tblsal tbody').append(row);
+                })
+
+            },
+            error: function () {
+                console.log("error data lod");
+            }
+        })
+
+
+
+
+        $("#txtDep").change(function () {
+            var id = $("#txtDep").val();
+            var day = $("#txtday").val();
+            $.getJSON({
+                type: "get",
+                url: "/EMS/Empdata",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: { id: id },
+                success: function (res) {
+                    $("#txttotal").val(res.EmpDailySalary);
+                },
+                error: function () {
+                    alert("error");
+                }
+            })
+        })
+
+        $("#txtday").keyup(function () {
+            var id = $("#txtDep").val();
+            day = $("#txtday").val();
+            $.getJSON({
+                type: "get",
+                url: "/EMS/Empdata",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: { id: id },
+                success: function (res) {
+                    $("#txttotal").val(res.EmpDailySalary * day);
+                },
+                error: function () {
+                    alert("error");
+                }
+            })
+        })
+       
+        //  id=  $("#txtDep").val()
+
+
+
+        $("#btnadd").click(function () {
+            var salary = {
+                DayAttend: $("#txtday").val(),
+                Period: $("#txtperiod").val(),
+                SalaryAmount: $("#txttotal").val(),
+                EmpNo:$("#txtDep").val()
+            }
+            $.ajax({
+                type: "POST",
+                url: "/EMS/salary",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(salary),
+                success: function (result) {
+                    $("#txtday").val('');
+                        $("#txtperiod").val('');
+                        $("#txttotal").val('');
+                        $("#txtDep").val('');
+                    var item = '';
+                    $.each(result, function (i, item) {
+                        var data = item.Period.split('/Date(',);
+                        var dat = data[1].split(')/',);
+                        var nd = dat[0] * 1;
+                        var date = new Date(nd).toString().split('00', '55');
+                        //var ndate = date.split('1', '15');
+                        var payday = 07
+                        var row = "<tr>"
+                            + "<td class='s'>" + item.SCode + "</td>"
+                            + "<td class='s'>" + item.EmpNo + "</td>"
+                            + "<td class='s'>" + item.DayAttend + "</td>"
+                            + "<td class='s'>" + date[0] + "</td>"
+                            + "<td class='s'>" + item.SalaryAmount + "</td>"
+                            + "<td class='s'>" + payday + "</td>"
+
+                        "</tr>"
+                        $('#tblsal tbody').append(row);
+                    })
+                    location.reload();
+                }
+            })
+        })
+
+        $('#tblsal tbody').on('click', 'tr', function () {
+          
+            $("#txtSCode").val(this.cells[0].innerHTML);
+            $("#txtDep").val(this.cells[1].innerHTML);
+            $("#txtday").val(this.cells[2].innerHTML);
+           // $("#txtperiod").val(date);
+            $("#txttotal").val(this.cells[4].innerHTML);
+
+        })
+
+        $("#btnupdate").click(function () {
+            var salary = {
+                SCode: $("#txtSCode").val(),
+                DayAttend: $("#txtday").val(),
+                Period: $("#txtperiod").val(),
+                SalaryAmount: $("#txttotal").val(),
+                EmpNo: $("#txtDep").val()
+            }
+            $.ajax({
+                type: "POST",
+                url: "/EMS/Editsalary",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(salary),
+                success: function (result) {
+                    if (result == false) {
+                        alert("please select Period");
+                    } else {
+                        location.reload();
+                    }
+                }
+            })
+        })
+
+        $("#btnclear").click(function () {
+            $("#txtday").val('');
+            $("#txtperiod").val('');
+            $("#txttotal").val('');
+            $("#txtDep").val('');
+        })
+
+
+    });
+</script>

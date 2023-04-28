@@ -1,0 +1,189 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+@Html.Partial("subviewpartial")
+<div><h2 style="text-align:center;">Manage Employee</h2></div>
+<div></div>
+<body>
+    <div class="split col-lg-4" style="color:aquamarine; height:300px;">
+        <i class="fa fa-vcard-o" style="font-size:36px"></i>
+        <div>         <input type="hidden" class="form-control" id="txtId" />     </div>
+        <div>           <label>Employee Name</label>       </div>
+        <div>         <input type="text" class="form-control" id="txtName" />     </div>
+        <div>           <label>Employee Gender</label>       </div>
+        <div>         <input type="text" class="form-control" id="txtgender" />     </div>
+        <div>           <label>Employee Department</label>       </div>
+        <div>
+            @*<input type="text" class="form-control"  id="txtdep"/>*@
+            @Html.DropDownList("Department_Name", new SelectList(ViewBag.department, "Id", "Department_Name"), new { Id = "txtDep", @class = "form-control" })
+        </div>
+        <div>           <label>Date of Birth</label>       </div>
+        <div>         <input type="date" data-date-format="DD MMMM YYYY" class="form-control" id="txtdob" /> 
+                     
+        </div>
+        <div>           <label>Joining Date</label>       </div>
+        <div>         <input type="date" data-date-format="DD MMMM YYYY" class="form-control" id="txtjoin" />     </div>
+        <div>           <label>Employee Daily Salary</label>       </div>
+        <div>         <input type="text" class="form-control" id="txtsalary" />     </div>
+        <div>
+            <button type="button" id="btnadd">Add</button> &nbsp;&nbsp;
+            <button type="button" id="btnupdate">Update</button>
+            <button type="button" id="btnclear">Clear</button>
+        </div>
+    </div>
+    <div class="split col-lg-8" style="lighting-color:antiquewhite; height:300px; ">
+        @using (Html.BeginForm())
+        {
+            <table id="tblemp" style="border:1px;  background-color:aquamarine" class="table table-bordered table-responsive table-striped ">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Emp Name</th>
+                        <th>Emp Gender</th>
+                        <th>Emp Department</th>
+                        <th>Date of Birth</th>
+                        <th>Joining Date</th>
+                        <th>Salary</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        }
+
+    </div>
+
+</body>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+     
+        $.ajax({
+            type: 'get',
+            url: "/EMS/getEmpdata",
+            contentType: "application/json; charset=utf-8",
+            success: function (res) {
+                console.log(res.DOB);
+                $.each(res, function (i, item) {
+                    //var ti = item.DOB.split('', 18);
+                    //var tic = ti[6] + ti[7] + ti[8] + ti[9] + ti[10] + ti[11] + ti[12] + ti[13] + ti[14] + ti[15] + ti[16] + ti[17] + 0;
+                    const dod = item.DOB.split('/',);
+                    var date1 = dod[1].split('Date(',);
+                    var dae = date1[1].split(')',);
+                    var ticksToMicrotime = dae[0] / 1;
+                    var tickDate = new Date(ticksToMicrotime).toString().split('00', '55');
+                    var join = item.JoiningDate.split('/Date(',)
+                    var join1 = join[1].split(')/',)
+                    var joindate = join1[0] / 1;
+                    var joiningdate = new Date(joindate).toString().split('00', '55');
+
+                    var rows = "<tr>"
+                        + "<td class='Id'>" + item.Id + "</td>"
+                        + "<td class='empname'>" + item.EmpName + "</td>"
+                        + "<td class='empgen'>" + item.EmpGender + "</td>"
+                        + "<td class='empdep'>" + item.EmpDepartment + "</td>"
+                        + "<td class='empdob'>" + tickDate[0]  + "</td>"
+                  
+                        + "<td class='empjoin'>" + joiningdate[0] + "</td>"
+                        + "<td class='empsalary'>" + item.EmpDailySalary + "</td>"
+                        + "</tr>";
+                    $('#tblemp tbody').append(rows);
+                });
+            }
+        })
+
+
+
+         $("#btnadd").click(function () {
+             debugger;
+            var emp = {
+                EmpName: $("#txtName").val(),
+                EmpGender: $("#txtgender").val(),
+                EmpDepartment: $("#txtDep").val(),
+                DOB: $("#txtdob").val(),
+                JoiningDate: $("#txtjoin").val(),
+                EmpDailySalary: $("#txtsalary").val()
+             }
+             //validateDOB();
+
+             $.ajax({
+                type: "POST",
+                url: "/EMS/AddEmp",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(emp),
+                 success: function (res) {
+                     if (res == false) {
+                         alert("please select DOB or Joining Date");
+                     } else {
+                         alert("Successfull");
+                         var items = '';
+                         $.each(res, function (i, item) {
+                             var rows = "<tr>"
+                                 + "<td class='empname'>" + item.EmpName + "</td>"
+                                 + "<td class='empger'>" + item.EmpGender + "</td>"
+                                 + "<td class='emddep'>" + item.EmpDepartment + "</td>"
+                                 + "<td class='empdob'>" + item.DOB + "</td>"
+                                 + "<td class='empjoin'>" + item.JoiningDate + "</td>"
+                                 + "<td class='empsalry'>" + item.EmpDailySalary + "</td>"
+                                 + "</tr>";
+                             $('#tblemp tbody').append(rows);
+                         });
+
+                     }
+                     location.reload();
+                 }
+             })
+         })
+
+        $("#tblemp tbody").on('click', 'tr', function () {
+            $("#txtId").val(this.cells[0].innerHTML);
+            $("#txtName").val(this.cells[1].innerHTML);
+            $("#txtgender").val(this.cells[2].innerHTML);
+            $("#txtDep").val(this.cells[3].innerHTML);
+            $("#txtdob").val(this.cells[4].innerHTML);
+            $("#txtjoin").val(this.cells[5].innerHTML);
+            $("#txtsalary").val(this.cells[6].innerHTML);
+        })
+
+        $("#btnupdate").click(function () {
+            var editemp = {
+             Id  : $("#txtId").val(),
+                EmpName: $("#txtName").val(),
+                EmpGender: $("#txtgender").val(),
+                EmpDepartment: $("#txtDep").val(),
+                DOB: $("#txtdob").val(),
+                JoiningDate: $("#txtjoin").val(),
+                EmpDailySalary: $("#txtsalary").val()
+            }
+            $.ajax({
+                type: "POST",
+                url: "/EMS/editEmployee",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(editemp),
+                success: function (res) {
+                    if (res == false) {
+                        alert("please select DOB and Joining Date")
+                    } else {
+                        location.reload();
+                    }
+                }
+            })
+        })
+
+
+    });
+
+    $("#btnclear").click(function(){
+        $("#txtId").val('');
+        $("#txtName").val('');
+        $("#txtgender").val('');
+        $("#txtDep").val('');
+        $("#txtdob").val('');
+        $("#txtjoin").val('');
+        $("#txtsalary").val('');
+    })
+
+     
+</script>
